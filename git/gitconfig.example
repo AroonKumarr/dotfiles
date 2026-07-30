@@ -1,0 +1,22 @@
+[user]
+    name = Aroon Kumar
+    email = YOUR_EMAIL@example.com
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = nano
+    autocrlf = input
+
+[pull]
+    ff = only
+
+[push]
+    autoSetupRemote = true
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    lg = log --oneline --graph --decorate

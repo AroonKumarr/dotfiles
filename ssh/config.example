@@ -1,0 +1,9 @@
+# Copy selected entries to ~/.ssh/config and update the values.
+# Never commit private keys or sensitive host information.
+
+Host ai-server
+    HostName 192.168.50.2
+    User aroon
+    IdentityFile ~/.ssh/id_ed25519
+    ServerAliveInterval 60
+    ServerAliveCountMax 3

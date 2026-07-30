@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+
+if [[ ! -d "$DOTFILES_DIR/.git" ]]; then
+  echo "Dotfiles repository not found at $DOTFILES_DIR"
+  exit 1
+fi
+
+git -C "$DOTFILES_DIR" pull --ff-only
+exec "$DOTFILES_DIR/install.sh"

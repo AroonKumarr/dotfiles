@@ -1,4 +1,4 @@
-# Better directory listings with eza
+# Directory listings
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza'
   alias l='eza -lah'
@@ -17,4 +17,7 @@ alias gl='git log --oneline --graph --decorate'
 # Navigation
 alias ..='cd ..'
 alias ...='cd ../..'
-alias dotfiles='cd ~/.dotfiles'
+alias dotfiles='cd "$DOTFILES"'
+
+# Safer defaults
+alias mkdir='mkdir -p'
