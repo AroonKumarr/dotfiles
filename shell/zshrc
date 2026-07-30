@@ -1,0 +1,35 @@
+# Powerlevel10k instant prompt
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Dotfiles repository
+export DOTFILES="$HOME/.dotfiles"
+
+# Oh My Zsh
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+
+source "$ZSH/oh-my-zsh.sh"
+
+# Shared configuration
+source "$DOTFILES/shell/aliases.zsh"
+
+# Operating-system-specific configuration
+case "$(uname -s)" in
+  Darwin)
+    source "$DOTFILES/os/macos.zsh"
+    ;;
+  Linux)
+    source "$DOTFILES/os/linux.zsh"
+    ;;
+esac
+
+# Powerlevel10k appearance
+[[ -f "$DOTFILES/shell/p10k.zsh" ]] && source "$DOTFILES/shell/p10k.zsh"
