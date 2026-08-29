@@ -156,7 +156,7 @@ Remove the symbolic links:
 rm ~/.zshrc ~/.p10k.zsh
 ```
 
-Then restore the latest backup from:
+Then restore the latest backup from::
 
 ```text
 ~/.dotfiles-backups/
