@@ -1,6 +1,23 @@
 # Windows package and font helper for PowerShell
 # Aroon Kumar's Dotfiles
 
+function Refresh-Path {
+    $machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+    $userPath    = [Environment]::GetEnvironmentVariable("Path", "User")
+    $extraPaths = @(
+        "$env:ProgramFiles\Git\cmd",
+        "$env:ProgramFiles\Git\bin",
+        "$env:LOCALAPPDATA\Programs\Git\cmd",
+        "$env:LOCALAPPDATA\Microsoft\WindowsApps",
+        "$HOME\scoop\shims",
+        "$env:LOCALAPPDATA\Programs\oh-my-posh\bin",
+        (Join-Path $DOTFILES_DIR "bin"),
+        (Join-Path $HOME ".local\bin")
+    )
+    $all = ($machinePath, $userPath, ($extraPaths -join ';')) -join ';'
+    $env:PATH = ($all -split ';' | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique) -join ';'
+}
+
 function Install-MesloFont {
     Write-Header "Installing MesloLGS Nerd Font"
 
@@ -133,8 +150,7 @@ function Configure-WindowsTerminalFont {
 
 function Install-WindowsPackages {
     Write-Header "Installing Windows packages"
-
-    $packagesInstalled = $false
+    Refresh-Path
 
     # 1. Primary: Windows Package Manager (winget)
     if (Get-Command winget -ErrorAction SilentlyContinue) {
@@ -157,30 +173,43 @@ function Install-WindowsPackages {
                     --accept-source-agreements --accept-package-agreements `
                     --disable-interactivity | Out-Null
             } catch {
-                Write-Warning "winget had an issue installing $($pkg.Name); continuing."
+                Write-Warning "winget had an issue installing $($pkg.Name); will attempt fallback."
             }
         }
-        $packagesInstalled = $true
+        Refresh-Path
     }
-    # 2. Secondary: Scoop
-    elseif (Get-Command scoop -ErrorAction SilentlyContinue) {
-        Write-Info "winget not found, using Scoop package manager."
-        $scoopPackages = @("git", "eza", "bat", "fd", "ripgrep", "fzf", "oh-my-posh")
-        foreach ($pkg in $scoopPackages) {
-            Write-Info "Ensuring $pkg is installed via Scoop..."
-            scoop install $pkg | Out-Null
+
+    # 2. Secondary fallback: Scoop
+    if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue) -or -not (Get-Command eza -ErrorAction SilentlyContinue)) {
+        if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+            Write-Info "Setting up Scoop for missing packages..."
+            try {
+                Invoke-RestMethod -Uri https://get.scoop.io -UseBasicParsing | Invoke-Expression
+                Refresh-Path
+            } catch {}
         }
-        $packagesInstalled = $true
+
+        if (Get-Command scoop -ErrorAction SilentlyContinue) {
+            $scoopPackages = @("git", "eza", "bat", "fd", "ripgrep", "fzf", "oh-my-posh")
+            foreach ($pkg in $scoopPackages) {
+                if (-not (Get-Command $pkg -ErrorAction SilentlyContinue)) {
+                    Write-Info "Installing $pkg via Scoop..."
+                    try {
+                        scoop install $pkg | Out-Null
+                    } catch {}
+                }
+            }
+            Refresh-Path
+        }
     }
-    # 3. Tertiary: Chocolatey
-    elseif (Get-Command choco -ErrorAction SilentlyContinue) {
-        Write-Info "Using Chocolatey package manager."
-        choco install git eza bat fd ripgrep fzf oh-my-posh -y | Out-Null
-        $packagesInstalled = $true
-    }
-    else {
-        Write-Warning "No supported package manager found (winget, scoop, or choco)."
-        Write-Warning "Install winget from Microsoft Store (App Installer), or install Scoop from https://scoop.sh"
+
+    # 3. Tertiary fallback for Oh My Posh: Direct official script
+    if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) {
+        Write-Info "Installing Oh My Posh via official installer..."
+        try {
+            Invoke-RestMethod -Uri https://ohmyposh.dev/install.ps1 -UseBasicParsing | Invoke-Expression
+            Refresh-Path
+        } catch {}
     }
 
     # Install Font automatically
@@ -196,6 +225,8 @@ function Install-WindowsPackages {
             Install-Module -Name PSReadLine -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber -ErrorAction SilentlyContinue
         }
     } catch {
-        # Non-fatal if PSReadLine installation cannot connect to PSGallery
+        # Non-fatal
     }
+
+    Refresh-Path
 }

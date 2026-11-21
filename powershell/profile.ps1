@@ -9,14 +9,20 @@ if (-not $env:DOTFILES) {
     $env:DOTFILES = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 }
 
-# Add personal executable directories to PATH
-$dotfilesBin = Join-Path $env:DOTFILES "bin"
-$localBin = Join-Path $HOME ".local\bin"
-if ((Test-Path $dotfilesBin) -and ($env:PATH -split ';' -notcontains $dotfilesBin)) {
-    $env:PATH = "$dotfilesBin;$env:PATH"
-}
-if ((Test-Path $localBin) -and ($env:PATH -split ';' -notcontains $localBin)) {
-    $env:PATH = "$localBin;$env:PATH"
+# Add personal and package manager executable directories to PATH
+$candidatePaths = @(
+    (Join-Path $env:DOTFILES "bin"),
+    (Join-Path $HOME ".local\bin"),
+    "$env:LOCALAPPDATA\Programs\oh-my-posh\bin",
+    "$env:LOCALAPPDATA\Microsoft\WindowsApps",
+    "$HOME\scoop\shims",
+    "$env:ProgramFiles\Git\cmd",
+    "$env:LOCALAPPDATA\Programs\Git\cmd"
+)
+foreach ($p in $candidatePaths) {
+    if ((Test-Path $p) -and ($env:PATH -split ';' -notcontains $p)) {
+        $env:PATH = "$p;$env:PATH"
+    }
 }
 
 # Configure Oh My Posh prompt (matching Powerlevel10k theme)
