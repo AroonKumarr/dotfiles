@@ -1,0 +1,81 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "os",
+          "style": "plain",
+          "foreground": "#61afef",
+          "template": "{{ if .WSL }}WSL at {{ end }}{{ .Icon }} "
+        },
+        {
+          "type": "path",
+          "style": "plain",
+          "foreground": "#61afef",
+          "template": "{{ .Path }} ",
+          "properties": {
+            "style": "full"
+          }
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "foreground": "#98c379",
+          "template": "{{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <#e5c07b>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</> "
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "status",
+          "style": "plain",
+          "foreground": "#e06c75",
+          "template": "{{ if gt .Code 0 }}{{ .Code }} {{ end }}"
+        },
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "#e5c07b",
+          "template": "{{ .FormattedMs }} ",
+          "properties": {
+            "threshold": 3000,
+            "style": "austere"
+          }
+        },
+        {
+          "type": "session",
+          "style": "plain",
+          "foreground": "#abb2bf",
+          "template": "{{ .UserName }}@{{ .HostName }} "
+        },
+        {
+          "type": "time",
+          "style": "plain",
+          "foreground": "#abb2bf",
+          "template": "{{ .CurrentDate | date \"03:04:05 PM\" }} "
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground": "#56b6c2",
+          "template": "❯ "
+        }
+      ]
+    }
+  ]
+}

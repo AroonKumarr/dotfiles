@@ -33,6 +33,9 @@ case "$(uname -s)" in
   Linux)
     [[ -f "$DOTFILES/os/linux.zsh" ]] && source "$DOTFILES/os/linux.zsh"
     ;;
+  MINGW*|MSYS*|CYGWIN*)
+    [[ -f "$DOTFILES/os/windows.zsh" ]] && source "$DOTFILES/os/windows.zsh"
+    ;;
 esac
 
 [[ -f "$DOTFILES/shell/p10k.zsh" ]] && source "$DOTFILES/shell/p10k.zsh"

@@ -23,6 +23,10 @@ main() {
       source "$DOTFILES_DIR/scripts/ubuntu.sh"
       install_ubuntu_packages
       ;;
+    MINGW*|MSYS*|CYGWIN*)
+      source "$DOTFILES_DIR/scripts/windows.sh"
+      install_windows_packages
+      ;;
   esac
 
   install_oh_my_zsh
@@ -32,7 +36,11 @@ main() {
   set_default_shell
 
   print_success "Installation complete."
-  printf '\nStart a new terminal session, or run:\n\n  exec zsh\n\n'
+  if command_exists zsh; then
+    printf '\nStart a new terminal session, or run:\n\n  exec zsh\n\n'
+  else
+    printf '\nStart a new terminal session.\n\n'
+  fi
 }
 
 main "$@"

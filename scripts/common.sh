@@ -31,7 +31,14 @@ require_supported_os() {
           print_warning "This installer is tested on Ubuntu. Continuing cautiously."
         fi
       fi
-      print_info "Detected Linux."
+      if grep -qi microsoft /proc/version 2>/dev/null || [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+        print_info "Detected Linux (WSL)."
+      else
+        print_info "Detected Linux."
+      fi
+      ;;
+    MINGW*|MSYS*|CYGWIN*)
+      print_info "Detected Windows ($(uname -s))."
       ;;
     *)
       echo "Unsupported operating system: $(uname -s)"
@@ -56,6 +63,11 @@ clone_or_update() {
 }
 
 install_oh_my_zsh() {
+  if ! command_exists zsh; then
+    print_warning "Zsh is not installed. Skipping Oh My Zsh installation."
+    return
+  fi
+
   if [[ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
     print_success "Oh My Zsh is already installed."
     return
@@ -67,6 +79,10 @@ install_oh_my_zsh() {
 }
 
 install_zsh_plugins() {
+  if ! command_exists zsh; then
+    return
+  fi
+
   print_header "Installing Zsh theme and plugins"
   local custom_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
@@ -104,8 +120,12 @@ link_file() {
   fi
 
   backup_path "$target_file"
-  ln -s "$source_file" "$target_file"
-  print_success "Linked $target_file -> $source_file"
+  if ln -s "$source_file" "$target_file" 2>/dev/null; then
+    print_success "Linked $target_file -> $source_file"
+  else
+    cp -f "$source_file" "$target_file"
+    print_warning "Symbolic link unavailable; copied $source_file to $target_file"
+  fi
 }
 
 create_dotfile_links() {
@@ -126,7 +146,11 @@ ensure_local_bin_on_path() {
   fi
 
   rm -f "$HOME/.local/bin/update-dotfiles"
-  ln -s "$updater" "$HOME/.local/bin/update-dotfiles"
+  if ln -s "$updater" "$HOME/.local/bin/update-dotfiles" 2>/dev/null; then
+    :
+  else
+    cp -f "$updater" "$HOME/.local/bin/update-dotfiles"
+  fi
 }
 
 set_default_shell() {
@@ -140,6 +164,11 @@ set_default_shell() {
 
   if [[ "${SHELL:-}" == "$zsh_path" ]]; then
     print_success "Zsh is already the default shell."
+    return
+  fi
+
+  if ! command_exists chsh; then
+    print_info "chsh is not available on this platform; skipping default shell change."
     return
   fi
 

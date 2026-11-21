@@ -14,6 +14,10 @@ if ! command -v git >/dev/null 2>&1; then
       sudo apt-get update
       sudo apt-get install -y git
       ;;
+    MINGW*|MSYS*|CYGWIN*)
+      echo "Git is required. Install Git from https://git-scm.com or run in PowerShell: winget install Git.Git"
+      exit 1
+      ;;
     *)
       echo "Unsupported operating system."
       exit 1
