@@ -157,10 +157,12 @@ function Main {
     Write-Success "Installation complete!"
     Write-Host @"
 
-Next steps for Windows:
-1. In Windows Terminal, select MesloLGS NF font:
-   Settings -> Defaults -> Appearance -> Font face -> MesloLGS NF
-2. Reload your profile or start a new terminal session:
+Everything has been automatically configured!
+- Packages installed (eza, bat, fd, ripgrep, fzf, oh-my-posh)
+- MesloLGS Nerd Font installed and configured in Windows Terminal
+- PowerShell profiles linked and ready
+
+Reload your profile or open a new terminal tab:
    . `$PROFILE
 
 "@ -ForegroundColor Cyan
