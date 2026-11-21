@@ -24,6 +24,6 @@ if (-not (Get-Command clip -ErrorAction SilentlyContinue)) {
 }
 
 # Parity with Debian/Ubuntu fdfind command
-if (Get-Command fd -ErrorAction SilentlyContinue -and -not (Get-Command fdfind -ErrorAction SilentlyContinue)) {
+if ((Get-Command fd -ErrorAction SilentlyContinue) -and (-not (Get-Command fdfind -ErrorAction SilentlyContinue))) {
     function fdfind { fd @args }
 }

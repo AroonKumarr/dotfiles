@@ -46,8 +46,7 @@
           "foreground": "#e5c07b",
           "template": "{{ .FormattedMs }} ",
           "properties": {
-            "threshold": 3000,
-            "style": "austere"
+            "threshold": 3000
           }
         },
         {

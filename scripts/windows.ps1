@@ -180,7 +180,7 @@ function Install-WindowsPackages {
     }
 
     # 2. Secondary fallback: Scoop
-    if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue) -or -not (Get-Command eza -ErrorAction SilentlyContinue)) {
+    if ((-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) -or (-not (Get-Command eza -ErrorAction SilentlyContinue))) {
         if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
             Write-Info "Setting up Scoop for missing packages..."
             try {
